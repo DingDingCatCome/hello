@@ -1,0 +1,37 @@
+package main // 声明 main 包，表明当前是一个可执行程序
+
+// 导入内置 fmt 包 and my own package
+import (
+	"flag"
+	"fmt"
+
+	"github.com/DingDingCatCome/gohive"
+	"github.com/DingDingCatCome/stringutil"
+)
+
+func main() { // main函数，是程序执行的入口
+	fmt.Println(stringutil.Reverse("Hello World!")) // 在终端打印 Hello World!
+
+	// usage : ./main -h 127.0.0.1:50000 -d default -q "show tables"
+
+	hiveAddr := flag.String("h", "172.16.16.155:10000", "addr of hive")
+	db := flag.String("d", "default", "db of hive")
+	query := flag.String("q", "show tables", "hsql of query")
+	flag.Parse()
+
+	conn, err := gohive.Connect(*hiveAddr, gohive.DefaultOptions)
+	if err != nil {
+		fmt.Println("connect hive error:", err)
+		return
+	}
+
+	conn.Exec("use " + *db)
+
+	rets, err := conn.SimpleQuery(*query)
+
+	if err != nil {
+		fmt.Println("query errer:", err)
+	}
+
+	fmt.Println("hive query result=", rets)
+}
