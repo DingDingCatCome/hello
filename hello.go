@@ -29,12 +29,7 @@ func main() { // main函数，是程序执行的入口
 	}
 	cursor := connection.Cursor()
 
-	//cursor.Exec(ctx, "INSERT INTO myTable VALUES(1, '1'), (2, '2'), (3, '3'), (4, '4')")
-	//if cursor.Err != nil {
-	//		log.Fatal(cursor.Err)
-	//	}
-
-	cursor.Exec(ctx, "SELECT * FROM etherum.top1000_erc20_token")
+	cursor.Exec(ctx, "SELECT * FROM etherum_orc.top1000_erc20_token")
 	if cursor.Err != nil {
 		log.Fatal(cursor.Err)
 	}
@@ -50,6 +45,34 @@ func main() { // main函数，是程序执行的入口
 			log.Fatal(cursor.Err)
 		}
 		log.Println(index, token_contract_address, name, symbol)
+	}
+
+	cursor.Exec(ctx, "CREATE TABLE IF NOT EXISTS etherum_orc.myTable (a INT, b STRING) STORED AS ORC")
+	if cursor.Err != nil {
+		log.Fatal(cursor.Err)
+	}
+
+	cursor.Exec(ctx, "INSERT INTO etherum_orc.myTable VALUES(1, '1'), (2, '2'), (3, '3'), (4, '4')")
+	if cursor.Err != nil {
+		log.Fatal(cursor.Err)
+	}
+
+	cursor.Exec(ctx, "SELECT * FROM etherum_orc.myTable")
+	if cursor.Err != nil {
+		log.Fatal(cursor.Err)
+	}
+
+	var i int32
+	var s string
+	for cursor.HasMore(ctx) {
+		if cursor.Err != nil {
+			log.Fatal(cursor.Err)
+		}
+		cursor.FetchOne(ctx, &i, &s)
+		if cursor.Err != nil {
+			log.Fatal(cursor.Err)
+		}
+		log.Println(i, s)
 	}
 
 	cursor.Close()
